@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // NAVIGATIONS CHANGE ACTIVITIES????
+
         if (id == R.id.nav_contacts) {
             // Handle the camera action
         } else if (id == R.id.nav_settings) {
