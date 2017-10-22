@@ -2,11 +2,17 @@ package me.cchiang.holdinghand;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,15 +25,31 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import android.view.View.OnTouchListener;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.SEND_SMS;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     CountDownTimer cTimer = null;
     private boolean isTouch = false;
+    private TextView txt1;
+
+    private ArrayList<Contact> conList;
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private Uri uriContact;
+    private String contactID;     // contacts unique ID
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +58,10 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Gets contacts
+        txt1 = (TextView)findViewById(R.id.txt1);
+        conList = new ArrayList<>();
+        requestPerms();
     
 
         findViewById(R.id.screen).setOnTouchListener(new OnTouchListener() {
@@ -163,7 +189,7 @@ public class MainActivity extends AppCompatActivity
 
     //start timer function
     void startTimer() {
-        cTimer = new CountDownTimer(15000, 1000) {
+        cTimer = new CountDownTimer(5000, 1000) {
             public void onTick(long millisUntilFinished) {
                 long seconds = millisUntilFinished;
                 final Toast cntdwn_msg = Toast.makeText(getApplicationContext(), "Touch released, starting countdown: "+seconds/1000, Toast.LENGTH_SHORT);
@@ -177,6 +203,7 @@ public class MainActivity extends AppCompatActivity
                 }, 1000);
             }
             public void onFinish() {
+                sendSMS();
                 Toast.makeText(getApplicationContext(), "Emergency!", Toast.LENGTH_SHORT).show();
 
             }
@@ -228,12 +255,137 @@ public class MainActivity extends AppCompatActivity
         // NAVIGATIONS CHANGE ACTIVITIES????
 
         if (id == R.id.nav_contacts) {
-            // Handle the camera action
+            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
         } else if (id == R.id.nav_settings) {
+
+        }else if (id == R.id.log_out){
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * SMS STUFFF
+     */
+
+    /**
+     * Sends the SMS to the assign numbers using the SmsManager
+     */
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Log.d(TAG, "Response: " + data.toString());
+            uriContact = data.getData();
+
+            String name = retrieveContactName();
+            String num = retrieveContactNumber();
+            conList.add(new Contact(name,num));
+
+            setContacts();
+
+        }
+    }
+
+    protected void sendSMS(){
+        SmsManager manager = SmsManager.getDefault();
+        for(int i = 0; i < conList.size(); i++){
+            String name = conList.get(i).name;
+            String num = conList.get(i).phone;
+            manager.sendTextMessage(num, null, "Hello " + name, null, null);
+            Log.w("SENT TO: ", name + " " + num);
+        }
+    }
+
+    /**
+     * Set Contacts on TextView (txt1)
+     */
+    public void setContacts(){
+        String name, num, combo;
+        String total = "";
+        for(int i = 0; i < conList.size(); i++){
+            name = conList.get(i).name;
+            num = conList.get(i).phone;
+            combo = name + " " + num + "\n";
+            total += combo;
+        }
+        txt1.setText(total);
+
+    }
+
+    /**
+     * Retrieve Contact Number
+     */
+    private String retrieveContactNumber() {
+
+        String contactNumber = null;
+
+        // getting contacts ID
+        Cursor cursorID = getContentResolver().query(uriContact,
+                new String[]{ContactsContract.Contacts._ID},
+                null, null, null);
+
+        if (cursorID.moveToFirst()) {
+
+            contactID = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
+        }
+
+        cursorID.close();
+
+        Log.d(TAG, "Contact ID: " + contactID);
+
+        // Using the contact ID now we will get contact phone number
+        Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
+
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
+                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
+
+                new String[]{contactID},
+                null);
+
+        if (cursorPhone.moveToFirst()) {
+            contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+        }
+
+        cursorPhone.close();
+
+        return contactNumber;
+//        Toast.makeText(getApplicationContext(), contactNumber, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * Retrieve Contact Name
+     */
+    private String retrieveContactName() {
+
+        String contactName = null;
+
+        // querying contact data store
+        Cursor cursor = getContentResolver().query(uriContact, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+
+            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+        }
+
+        cursor.close();
+
+        return contactName;
+
+    }
+
+
+    /**
+     * Request Permissions for Sending SMS, Reading Contacts, Accessing Locations
+     */
+    protected void requestPerms(){
+        requestPermissions(new String[]{SEND_SMS, READ_CONTACTS, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, INTERNET}, 1);
+
     }
 }
