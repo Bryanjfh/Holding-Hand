@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = MainActivity.class.getSimpleName();
     private Uri uriContact;
     private String contactID;     // contacts unique ID
-
+    private String linkMap;
     ////////
     Location mLocation;
     TextView latLng;
@@ -217,14 +217,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void clickpopo(View btnpopo){
 
-        String linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
+        linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
 
         txt2.setText(linkMap);
 
-        Uri uri = Uri.parse(linkMap);
-        Log.w("Link: ", linkMap);
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        startActivity(intent);
+//        Uri uri = Uri.parse(linkMap);
+//        Log.w("Link: ", linkMap);
+//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+//        startActivity(intent);
 
     }
 
@@ -583,10 +583,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     protected void sendSMS(){
         SmsManager manager = SmsManager.getDefault();
+        linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
+
+//        txt2.setText(linkMap);
         for(int i = 0; i < conList.size(); i++){
             String name = conList.get(i).name;
             String num = conList.get(i).phone;
-            manager.sendTextMessage(num, null, "Hello " + name, null, null);
+            String msg = "HELP!!! " + name + ", please help me. I'm getting assaulted at " + linkMap + "!";
+            manager.sendTextMessage(num, null, msg, null, null);
             Log.w("SENT TO: ", name + " " + num);
         }
     }
