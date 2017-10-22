@@ -9,6 +9,46 @@
     tools:context="me.cchiang.holdinghand.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="122dp"
+        android:layout_below="@+id/screen"
+        android:layout_alignParentStart="true">
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#DDDDDD"
+        android:layout_marginTop="15dp"
+        android:id="@+id/linearLayout"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@drawable/ic_main_logo"
+            android:layout_below="@+id/txt1"
+            android:layout_toStartOf="@+id/screen" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:text="Holding Hands"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:layout_alignTop="@+id/imageView3"
+            android:layout_toEndOf="@+id/imageView3"
+            android:layout_marginTop="11dp" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/screen"
         android:layout_width="wrap_content"
@@ -21,8 +61,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="189dp"
-        android:layout_below="@+id/txt1"
+        android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

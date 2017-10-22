@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -127,12 +128,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
+                    v.setBackgroundColor(Color.RED);
+
                     Toast.makeText(MainActivity.this, "Aware mode on", Toast.LENGTH_SHORT).show();
                     isTouch = true;
                     cancelTimer();
                 }
                 if (event.getAction() == MotionEvent.ACTION_UP) {
                     //Toast.makeText(this, "RELEASED "+"X: "+X+" Y: "+Y, Toast.LENGTH_SHORT).show();
+                    v.setBackgroundColor(Color.WHITE);
                     startTimer();
                     showDialog();
 
@@ -495,7 +499,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(myIntent);
 //            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
         } else if (id == R.id.nav_settings) {
-
+            Intent myIntent = new Intent(this, SettingActivity.class);
+            startActivity(myIntent);
         }else if (id == R.id.log_out){
 
         }else if (id == R.id.nav_home){

@@ -221,7 +221,8 @@ public class ContactActivity extends AppCompatActivity
 
 
         } else if (id == R.id.nav_settings) {
-
+            Intent myIntent = new Intent(this, SettingActivity.class);
+            startActivity(myIntent);
         }else if (id == R.id.log_out){
 
         }else if (id == R.id.nav_home){

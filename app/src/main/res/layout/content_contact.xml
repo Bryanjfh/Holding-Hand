@@ -11,14 +11,15 @@
 
     <TextView
         android:id="@+id/txt2"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="75dp"
-        android:text="Lit Lit"
-        tools:layout_editor_absoluteX="175dp"
-        tools:layout_editor_absoluteY="226dp" />
+
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:background="#DDDDDD"
+        android:text="-"
+        tools:layout_editor_absoluteX="162dp"
+        tools:layout_editor_absoluteY="360dp" />
 
     <Button
         android:id="@+id/button2"
@@ -28,7 +29,7 @@
         android:text="Open Contacts"
         tools:layout_editor_absoluteX="123dp"
         tools:layout_editor_absoluteY="425dp"
-        android:layout_marginBottom="58dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="97dp" />
 </RelativeLayout>
