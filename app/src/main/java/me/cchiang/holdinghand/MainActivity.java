@@ -1,9 +1,16 @@
 package me.cchiang.holdinghand;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -11,6 +18,7 @@ import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +38,10 @@ import android.widget.Toast;
 
 import android.view.View.OnTouchListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -38,7 +49,14 @@ import static android.Manifest.permission.INTERNET;
 import static android.Manifest.permission.READ_CONTACTS;
 import static android.Manifest.permission.SEND_SMS;
 
+
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+//    static final int REQUEST_LOCATION = 1;
+//    LocationManager locationManager;
+//    GPSTracker gps;
+
 
     CountDownTimer cTimer = null;
     private boolean isTouch = false;
@@ -49,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Uri uriContact;
     private String contactID;     // contacts unique ID
 
+
+    double longitude, latitude;
 
 
     @Override
@@ -62,6 +82,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txt1 = (TextView)findViewById(R.id.txt1);
         conList = new ArrayList<>();
         requestPerms();
+
+//        locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+//        getLocation();
     
 
         findViewById(R.id.screen).setOnTouchListener(new OnTouchListener() {
@@ -92,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
     }
+
+
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -185,6 +211,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         alertDialog.show();
 
     }
+
+    /**
+     * btn2 Location
+     */
+//    public void showLoc(View LocationBtn){
+//        gps = new GPSTracker(MainActivity.this);
+//
+//        if(gps.canGetLocation()) {
+//            double latitude = gps.getLatitude();
+//            double longitude = gps.getLongitude();
+//
+//            Toast.makeText(
+//                    getApplicationContext(),
+//                    "Your Location is -\nLat: " + latitude + "\nLong: "
+//                            + longitude, Toast.LENGTH_LONG).show();
+//        } else {
+//            gps.showSettingsAlert();
+//        }
+//
+//    }
 
 
     //start timer function
