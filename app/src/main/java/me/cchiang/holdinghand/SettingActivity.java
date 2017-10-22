@@ -2,25 +2,24 @@ package me.cchiang.holdinghand;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 public class SettingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public static String PIN = "0000";
-    EditText et;
+    public static String MSG = null;
+    EditText et, et2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +27,7 @@ public class SettingActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         et = (EditText)findViewById(R.id.editText2);
+        et2 = (EditText)findViewById(R.id.editText5);
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -40,7 +40,7 @@ public class SettingActivity extends AppCompatActivity
 
     public void setPin(View btnPin){
         String newPIN = et.getText().toString();
-        if(newPIN.length() == 4 && isNum(newPIN)){
+        if((newPIN.length() == 4 )&& isNum(newPIN)){
             PIN = et.getText().toString();
             Log.w("Pin: ", PIN);
         }else{
@@ -52,6 +52,19 @@ public class SettingActivity extends AppCompatActivity
         return PIN;
     }
 
+    public void setMsg(View btnMsg){
+        String newMsg = et2.getText().toString();
+        if(newMsg.length() >= 1){
+            MSG = et2.getText().toString();
+            Log.w("Msg: ", MSG);
+        }else{
+            Toast.makeText(getApplicationContext(), "Message invalid", Toast.LENGTH_LONG);
+        }
+    }
+
+    public static String getMsg(){
+        return MSG;
+    }
 
     public static boolean isNum(String strNum) {
         boolean ret = true;
@@ -103,21 +116,21 @@ public class SettingActivity extends AppCompatActivity
         int id = item.getItemId();
 
 
-            if (id == R.id.nav_contacts) {
-                Intent myIntent = new Intent(this, ContactActivity.class);
-                startActivity(myIntent);
+        if (id == R.id.nav_contacts) {
+            Intent myIntent = new Intent(this, ContactActivity.class);
+            startActivity(myIntent);
 //            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
-            } else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_settings) {
 
-            }else if (id == R.id.log_out){
+        }else if (id == R.id.log_out){
 
-            }else if (id == R.id.nav_home){
+        }else if (id == R.id.nav_home){
 //            log.w
             Intent myIntent = new Intent(this, MainActivity.class);
             startActivity(myIntent);
-            }
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
         }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 }

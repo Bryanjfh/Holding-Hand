@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         cTimer = new CountDownTimer(10000, 1000) {
             public void onTick(long millisUntilFinished) {
                 long seconds = millisUntilFinished;
-                final Toast cntdwn_msg = Toast.makeText(getApplicationContext(), "Touch released, starting countdown: "+seconds/1000, Toast.LENGTH_SHORT);
+                final Toast cntdwn_msg = Toast.makeText(getApplicationContext(), "Countdown: "+seconds/1000, Toast.LENGTH_SHORT);
                 cntdwn_msg.show();
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -532,10 +532,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String name = currList.get(i).name;
                 String num = currList.get(i).phone;
                 String msg = "HELP!!! " + name + ", please help me. I'm getting assaulted at " + linkMap + "!";
+                String currMsg = SettingActivity.getMsg();
+                if(currMsg != null) {
+                    msg = "HELP!!! " + name + ", " + currMsg + " " + linkMap + "!";
+                }
                 manager.sendTextMessage(num, null, msg, null, null);
                 Log.w("SENT TO: ", name + " " + num);
             }
         }
+
 
     }
 
