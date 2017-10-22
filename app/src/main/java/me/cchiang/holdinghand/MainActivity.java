@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     CountDownTimer cTimer = null;
     private boolean isTouch = false;
-
+    private AlertDialog alertDialog;
     private static final String TAG = MainActivity.class.getSimpleName();
     private Uri uriContact;
     private String contactID;     // contacts unique ID
@@ -373,7 +373,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 String user_text = (userInput.getText()).toString();
 
                                 /** CHECK FOR USER'S INPUT **/
-                                if (user_text.equals("1234"))
+                                String currPIN = SettingActivity.getPin();
+                                Log.w("Main PIN ", currPIN);
+                                if (user_text.equals(currPIN))
                                 {
                                     //Log.d(user_text, "HELLO THIS IS THE MESSAGE CAUGHT :)");
                                     Toast.makeText(getApplicationContext(), "Emergency canceled", Toast.LENGTH_SHORT).show();
@@ -413,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 );
 
         // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog = alertDialogBuilder.create();
 
         // show it
         alertDialog.show();
@@ -424,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Starts Countdown
      */
     void startTimer() {
-        cTimer = new CountDownTimer(5000, 1000) {
+        cTimer = new CountDownTimer(10000, 1000) {
             public void onTick(long millisUntilFinished) {
                 long seconds = millisUntilFinished;
                 final Toast cntdwn_msg = Toast.makeText(getApplicationContext(), "Touch released, starting countdown: "+seconds/1000, Toast.LENGTH_SHORT);
@@ -438,8 +440,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }, 1000);
             }
             public void onFinish() {
+                alertDialog.dismiss();
                 sendSMS();
-                Toast.makeText(getApplicationContext(), "Emergency!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "SMS Sent!", Toast.LENGTH_SHORT).show();
 
             }
         };
@@ -504,9 +507,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }else if (id == R.id.log_out){
 
         }else if (id == R.id.nav_home){
-//            log.w
-//            Intent myIntent = new Intent(this, ContactActivity.class);
-//            startActivity(myIntent);
+
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

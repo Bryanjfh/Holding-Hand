@@ -15,10 +15,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SettingActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    public static String PIN = "0000";
     EditText et;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +27,7 @@ public class SettingActivity extends AppCompatActivity
         setContentView(R.layout.activity_setting);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         et = (EditText)findViewById(R.id.editText2);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -40,9 +39,31 @@ public class SettingActivity extends AppCompatActivity
     }
 
     public void setPin(View btnPin){
-        Log.w("Pin: ", et.getText().toString());
+        String newPIN = et.getText().toString();
+        if(newPIN.length() == 4 && isNum(newPIN)){
+            PIN = et.getText().toString();
+            Log.w("Pin: ", PIN);
+        }else{
+            Toast.makeText(getApplicationContext(), "Pin must me 4 characters", Toast.LENGTH_LONG);
+        }
     }
 
+    public static String getPin(){
+        return PIN;
+    }
+
+
+    public static boolean isNum(String strNum) {
+        boolean ret = true;
+        try {
+
+            Double.parseDouble(strNum);
+
+        }catch (NumberFormatException e) {
+            ret = false;
+        }
+        return ret;
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -92,7 +113,7 @@ public class SettingActivity extends AppCompatActivity
 
             }else if (id == R.id.nav_home){
 //            log.w
-            Intent myIntent = new Intent(this, SettingActivity.class);
+            Intent myIntent = new Intent(this, MainActivity.class);
             startActivity(myIntent);
             }
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
