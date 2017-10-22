@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Uri uriContact;
     private String contactID;     // contacts unique ID
     private String linkMap;
-    ////////
     Location mLocation;
     TextView latLng;
     GoogleApiClient mGoogleApiClient;
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ArrayList<String> permissions = new ArrayList<>();
 
     private final static int ALL_PERMISSIONS_RESULT = 101;
-    /////////////
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Gets contacts
         txt1 = (TextView)findViewById(R.id.txt1);
-        txt2 = (TextView)findViewById(R.id.txt2);
+//        txt2 = (TextView)findViewById(R.id.txt2);
         conList = new ArrayList<>();
         requestPerms();
 
@@ -156,8 +154,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    //////
 
+    /**
+     * GPS CONNECTION
+     */
     private ArrayList<String> findUnAskedPermissions(ArrayList<String> wanted) {
         ArrayList<String> result = new ArrayList<String>();
 
@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 result.add(perm);
             }
         }
-
         return result;
     }
 
@@ -192,41 +191,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
             return;
         }
         mLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-
-        if(mLocation!=null)
-        {
-//            latLng.setText("Latitude : "+mLocation.getLatitude()+" , Longitude : "+mLocation.getLongitude());
-        }
-
-
-
 
         startLocationUpdates();
 
     }
 
-    public void clickpopo(View btnpopo){
-
-        linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
-
-        txt2.setText(linkMap);
-
-//        Uri uri = Uri.parse(linkMap);
-//        Log.w("Link: ", linkMap);
-//        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-//        startActivity(intent);
-
-    }
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -240,12 +213,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onLocationChanged(Location location) {
-
-//        if(location!=null)
-//            latLng.setText("Latitude : "+location.getLatitude()+" , Longitude : "+location.getLongitude());
-
-
-
     }
 
     private boolean checkPlayServices() {
@@ -358,14 +325,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ///////
 
-
-
-
+    /*
+     * DETECT TOUCH OF THE SCREEN
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        int X = (int) event.getX();
-        int Y = (int) event.getY();
         int eventaction = event.getAction();
 
 
@@ -377,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
 
             case MotionEvent.ACTION_UP:
-                //Toast.makeText(this, "RELEASED "+"X: "+X+" Y: "+Y, Toast.LENGTH_SHORT).show();
                 startTimer();
                 showDialog();
                 break;
@@ -385,6 +348,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    /*
+     * SHOW PROMPTS ABOUT BEEN AWARE
+     */
     public void showDialog(){
         LayoutInflater li = LayoutInflater.from(this);
         View promptsView = li.inflate(R.layout.searchprompt, null);
@@ -393,7 +359,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         final EditText userInput = (EditText) promptsView
                 .findViewById(R.id.user_input);
-
 
         // set dialog message
         alertDialogBuilder
@@ -439,7 +404,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
                                 dialog.dismiss();
-                                //startTimer();
                             }
 
                         }
@@ -454,30 +418,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    /**
-     * btn2 Location
+    /*
+     * Starts Countdown
      */
-//    public void showLoc(View LocationBtn){
-//        txt1.setText(linkMap);
-//
-//        gps = new GPSTracker(MainActivity.this);
-//
-//        if(gps.canGetLocation()) {
-//            double latitude = gps.getLatitude();
-//            double longitude = gps.getLongitude();
-//
-//            Toast.makeText(
-//                    getApplicationContext(),
-//                    "Your Location is -\nLat: " + latitude + "\nLong: "
-//                            + longitude, Toast.LENGTH_LONG).show();
-//        } else {
-//            gps.showSettingsAlert();
-//        }
-//
-//    }
-
-
-    //start timer function
     void startTimer() {
         cTimer = new CountDownTimer(5000, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -502,7 +445,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    //cancel timer
+    /*
+     * Cancels Timer
+     */
     void cancelTimer() {
         if(cTimer!=null)
             cTimer.cancel();
@@ -536,13 +481,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+
+    /*
+     * Navigates through activities
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        // NAVIGATIONS CHANGE ACTIVITIES????
 
         if (id == R.id.nav_contacts) {
             startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
@@ -557,13 +505,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     /**
-     * SMS STUFFF
+     * SMS STUFF
      */
 
-    /**
+    /*
      * Sends the SMS to the assign numbers using the SmsManager
      */
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -581,11 +528,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    /*
+     * Sends the SMS to the selected contacts
+     */
     protected void sendSMS(){
         SmsManager manager = SmsManager.getDefault();
         linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
 
-//        txt2.setText(linkMap);
         for(int i = 0; i < conList.size(); i++){
             String name = conList.get(i).name;
             String num = conList.get(i).phone;
@@ -595,7 +544,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
+    /*
      * Set Contacts on TextView (txt1)
      */
     public void setContacts(){
@@ -611,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    /**
+    /*
      * Retrieve Contact Number
      */
     private String retrieveContactNumber() {
@@ -653,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Toast.makeText(getApplicationContext(), contactNumber, Toast.LENGTH_SHORT).show();
     }
 
-    /**
+    /*
      * Retrieve Contact Name
      */
     private String retrieveContactName() {
@@ -676,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     /**
-     * Request Permissions for Sending SMS, Reading Contacts, Accessing Locations
+     * Request Permissions
      */
     protected void requestPerms(){
         requestPermissions(new String[]{SEND_SMS, READ_CONTACTS, ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION, INTERNET}, 1);
