@@ -213,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onLocationChanged(Location location) {
+
     }
 
     private boolean checkPlayServices() {
