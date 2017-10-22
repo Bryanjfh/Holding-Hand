@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     CountDownTimer cTimer = null;
     private boolean isTouch = false;
 
-    private ArrayList<Contact> conList;
     private static final String TAG = MainActivity.class.getSimpleName();
     private Uri uriContact;
     private String contactID;     // contacts unique ID
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Location mLocation;
     TextView latLng;
     GoogleApiClient mGoogleApiClient;
-    TextView txt1, txt2;
+    TextView txt1;
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private LocationRequest mLocationRequest;
@@ -97,8 +96,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Gets contacts
         txt1 = (TextView)findViewById(R.id.txt1);
-//        txt2 = (TextView)findViewById(R.id.txt2);
-        conList = new ArrayList<>();
         requestPerms();
 
         //////
@@ -494,11 +491,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         if (id == R.id.nav_contacts) {
-            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
+            Intent myIntent = new Intent(this, ContactActivity.class);
+            startActivity(myIntent);
+//            startActivityForResult(new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI), 1);
         } else if (id == R.id.nav_settings) {
 
         }else if (id == R.id.log_out){
 
+        }else if (id == R.id.nav_home){
+//            log.w
+//            Intent myIntent = new Intent(this, ContactActivity.class);
+//            startActivity(myIntent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -509,25 +512,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * SMS STUFF
      */
 
-    /*
-     * Sends the SMS to the assign numbers using the SmsManager
-     */
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            Log.d(TAG, "Response: " + data.toString());
-            uriContact = data.getData();
-
-            String name = retrieveContactName();
-            String num = retrieveContactNumber();
-            conList.add(new Contact(name,num));
-
-            setContacts();
-
-        }
-    }
 
     /*
      * Sends the SMS to the selected contacts
@@ -535,95 +519,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void sendSMS(){
         SmsManager manager = SmsManager.getDefault();
         linkMap = "http://maps.google.com/?q=" + mLocation.getLatitude() + ","+ mLocation.getLongitude();
+        ArrayList<Contact> currList = ContactActivity.getList();
 
-        for(int i = 0; i < conList.size(); i++){
-            String name = conList.get(i).name;
-            String num = conList.get(i).phone;
-            String msg = "HELP!!! " + name + ", please help me. I'm getting assaulted at " + linkMap + "!";
-            manager.sendTextMessage(num, null, msg, null, null);
-            Log.w("SENT TO: ", name + " " + num);
+        if(currList.size() > 0){
+            for(int i = 0; i < currList.size(); i++){
+                String name = currList.get(i).name;
+                String num = currList.get(i).phone;
+                String msg = "HELP!!! " + name + ", please help me. I'm getting assaulted at " + linkMap + "!";
+                manager.sendTextMessage(num, null, msg, null, null);
+                Log.w("SENT TO: ", name + " " + num);
+            }
         }
-    }
-
-    /*
-     * Set Contacts on TextView (txt1)
-     */
-    public void setContacts(){
-        String name, num, combo;
-        String total = "";
-        for(int i = 0; i < conList.size(); i++){
-            name = conList.get(i).name;
-            num = conList.get(i).phone;
-            combo = name + " " + num + "\n";
-            total += combo;
-        }
-        txt1.setText(total);
 
     }
-
-    /*
-     * Retrieve Contact Number
-     */
-    private String retrieveContactNumber() {
-
-        String contactNumber = null;
-
-        // getting contacts ID
-        Cursor cursorID = getContentResolver().query(uriContact,
-                new String[]{ContactsContract.Contacts._ID},
-                null, null, null);
-
-        if (cursorID.moveToFirst()) {
-
-            contactID = cursorID.getString(cursorID.getColumnIndex(ContactsContract.Contacts._ID));
-        }
-
-        cursorID.close();
-
-        Log.d(TAG, "Contact ID: " + contactID);
-
-        // Using the contact ID now we will get contact phone number
-        Cursor cursorPhone = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone.NUMBER},
-
-                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ? AND " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE + " = " +
-                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE,
-
-                new String[]{contactID},
-                null);
-
-        if (cursorPhone.moveToFirst()) {
-            contactNumber = cursorPhone.getString(cursorPhone.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-        }
-
-        cursorPhone.close();
-
-        return contactNumber;
-//        Toast.makeText(getApplicationContext(), contactNumber, Toast.LENGTH_SHORT).show();
-    }
-
-    /*
-     * Retrieve Contact Name
-     */
-    private String retrieveContactName() {
-
-        String contactName = null;
-
-        // querying contact data store
-        Cursor cursor = getContentResolver().query(uriContact, null, null, null, null);
-
-        if (cursor.moveToFirst()) {
-
-            contactName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-        }
-
-        cursor.close();
-
-        return contactName;
-
-    }
-
 
     /**
      * Request Permissions
