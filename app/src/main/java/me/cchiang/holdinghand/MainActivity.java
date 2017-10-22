@@ -1,8 +1,14 @@
 package me.cchiang.holdinghand;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +18,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import android.view.View.OnTouchListener;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    CountDownTimer cTimer = null;
+    private boolean isTouch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,12 +36,24 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+    
+
+        findViewById(R.id.screen).setOnTouchListener(new OnTouchListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                    Toast.makeText(MainActivity.this, "Aware mode on", Toast.LENGTH_SHORT).show();
+                    isTouch = true;
+                    cancelTimer();
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    //Toast.makeText(this, "RELEASED "+"X: "+X+" Y: "+Y, Toast.LENGTH_SHORT).show();
+                    startTimer();
+                    showDialog();
+
+                }
+                return true;
             }
         });
 
@@ -40,6 +65,130 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        int X = (int) event.getX();
+        int Y = (int) event.getY();
+        int eventaction = event.getAction();
+
+
+        switch (eventaction) {
+            case MotionEvent.ACTION_DOWN:
+                Toast.makeText(this, "Aware mode on", Toast.LENGTH_SHORT).show();
+                isTouch = true;
+                cancelTimer();
+                break;
+
+            case MotionEvent.ACTION_UP:
+                //Toast.makeText(this, "RELEASED "+"X: "+X+" Y: "+Y, Toast.LENGTH_SHORT).show();
+                startTimer();
+                showDialog();
+                break;
+        }
+        return true;
+    }
+
+    public void showDialog(){
+        LayoutInflater li = LayoutInflater.from(this);
+        View promptsView = li.inflate(R.layout.searchprompt, null);
+        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(promptsView);
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.user_input);
+
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setTitle("Enter Your 4 Number Pin:")
+                .setNegativeButton("Enter",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                /** DO THE METHOD HERE WHEN PROCEED IS CLICKED*/
+                                String user_text = (userInput.getText()).toString();
+
+                                /** CHECK FOR USER'S INPUT **/
+                                if (user_text.equals("1234"))
+                                {
+                                    //Log.d(user_text, "HELLO THIS IS THE MESSAGE CAUGHT :)");
+                                    Toast.makeText(getApplicationContext(), "Emergency canceled", Toast.LENGTH_SHORT).show();
+                                    //Search_Tips(user_text);
+                                    cancelTimer();
+
+                                }
+                                else{
+                                    //Log.d(user_text,"string is empty");
+                                    Toast.makeText(getApplicationContext(), "Empty String", Toast.LENGTH_SHORT).show();
+                                    String message = "The password you have entered is incorrect." + " \n \n" + "Please try again!";
+                                    //startTimer();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                                    builder.setTitle("Error");
+                                    builder.setMessage(message);
+                                    builder.setPositiveButton("Cancel", null);
+                                    builder.setNegativeButton("Retry", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            showDialog();
+
+                                        }
+                                    });
+                                    builder.create().show();
+
+                                }
+                            }
+                        })
+                .setPositiveButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.dismiss();
+                                //startTimer();
+                            }
+
+                        }
+
+                );
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+
+    }
+
+
+    //start timer function
+    void startTimer() {
+        cTimer = new CountDownTimer(15000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                long seconds = millisUntilFinished;
+                final Toast cntdwn_msg = Toast.makeText(getApplicationContext(), "Touch released, starting countdown: "+seconds/1000, Toast.LENGTH_SHORT);
+                cntdwn_msg.show();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        cntdwn_msg.cancel();
+                    }
+                }, 1000);
+            }
+            public void onFinish() {
+                Toast.makeText(getApplicationContext(), "Emergency!", Toast.LENGTH_SHORT).show();
+
+            }
+        };
+        cTimer.start();
+    }
+
+
+    //cancel timer
+    void cancelTimer() {
+        if(cTimer!=null)
+            cTimer.cancel();
     }
 
     @Override
